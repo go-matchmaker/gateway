@@ -1,0 +1,33 @@
+version: "3.3"
+
+services:
+  postgres:
+    image: postgres:16.1-alpine3.19
+    container_name: go-auth-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=auth
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d postgres -U pass"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - common-network
+
+networks:
+  common-network:
+    driver: bridge
+
+volumes:
+  postgres:
+    driver: local

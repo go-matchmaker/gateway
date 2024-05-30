@@ -27,6 +27,7 @@ log/
 *.test
 
 # exclude any generated files
+.DS_Store
 .data
 qodana.yaml
 logger/app.log

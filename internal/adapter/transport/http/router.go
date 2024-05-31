@@ -14,6 +14,6 @@ func (s *server) authRouter() {
 }
 
 func (s *server) hrManagementRouter() {
-	//route := s.app.Group("/hr-management")
-	//route.Post("/create-user", s.CreateUser, s.RateLimiter(5, time.Minute), s.CreateUserValidation)
+	route := s.app.Group("/hr-management")
+	route.Post("/create-user", s.CreateUser, s.RateLimiter(5, time.Minute), s.GetUserDetail, s.GetUserDetail)
 }

@@ -18,7 +18,7 @@ const (
 	UserDetail = "UserDetail"
 )
 
-func (s *server) IsAuthorized(c fiber.Ctx) error {
+func (s *server) GetUserDetail(c fiber.Ctx) error {
 	token := c.Get(AuthHeader)
 	if token == "" {
 		return s.errorResponse(c, "authorization header is not provided", errors.New("authorization header is not provided"), nil, fiber.StatusUnauthorized)
@@ -74,6 +74,24 @@ func (s *server) IsAuthorized(c fiber.Ctx) error {
 	}
 
 	c.Locals(UserDetail, authResponse)
+
+	return c.Next()
+}
+
+func (s *server) HRPermission(c fiber.Ctx) error {
+	userDetail, ok := c.Locals(UserDetail).(dto.AuthMiddlewareResponse)
+	if !ok {
+		return s.errorResponse(c, "user detail not found in context", errors.New("user detail not found in context"), nil, fiber.StatusUnauthorized)
+	}
+
+	hrAttributes, ok := userDetail.Attributes["HR"]
+	if !ok {
+		return s.errorResponse(c, "user does not have HR permission", errors.New("user does not have HR permission"), nil, fiber.StatusUnauthorized)
+	}
+
+	if !hrAttributes.Add {
+		return s.errorResponse(c, "user does not have create permission ", errors.New("user does not have create permission "), nil, fiber.StatusUnauthorized)
+	}
 
 	return c.Next()
 }

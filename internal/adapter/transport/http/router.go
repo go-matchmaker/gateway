@@ -1,6 +1,4 @@
-package server
-
-import "fmt"
+package http
 
 func (s *server) SetupRouter() {
 	s.authRouter()
@@ -8,5 +6,5 @@ func (s *server) SetupRouter() {
 
 func (s *server) authRouter() {
 	route := s.app.Group("/auth")
-	fmt.Println(route)
+	route.Post("/login", s.Login)
 }

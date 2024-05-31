@@ -9,19 +9,5 @@ http:
   port: 8000
 
 settings:
-  ttl: 3 * 60 # minutes
-  server_read_timeout: 5
-
-services:
-  auth:
-    url: "http://auth-service.com"
-    cache: true
-    ttl: 60 # minutes
-    log_level: 1
-
-  management:
-    url: "http://management-service.com"
-    cache: false
-    ttl: 0 # minutes
-    log_level: 1
-
+  ttl: "1h" # minutes
+  server_read_timeout: 15

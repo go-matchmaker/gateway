@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
+	"time"
 )
 
 const (
@@ -23,15 +24,8 @@ type HTTPConfig struct {
 }
 
 type SettingsConfig struct {
-	TTL               int `yaml:"ttl"`
-	ServerReadTimeout int `yaml:"server_read_timeout"`
-}
-
-type ServiceConfig struct {
-	URL      string `yaml:"url"`
-	Cache    bool   `yaml:"cache"`
-	TTL      int    `yaml:"ttl"`
-	LogLevel int    `yaml:"log_level"`
+	TTL               time.Duration `yaml:"ttl"`
+	ServerReadTimeout int           `yaml:"server_read_timeout"`
 }
 
 type Config struct {
@@ -39,24 +33,23 @@ type Config struct {
 	Log      LogConfig      `yaml:"log"`
 	HTTP     HTTPConfig     `yaml:"http"`
 	Settings SettingsConfig `yaml:"settings"`
-	Services struct {
-		Auth       ServiceConfig `yaml:"auth"`
-		Management ServiceConfig `yaml:"management"`
-	} `yaml:"services"`
 }
 
 func LoadConfig() (*Config, error) {
-	var cfg *Config
+	var cfg Config
 
-	err := cleanenv.ReadConfig(configPath, cfg)
+	err := cleanenv.ReadConfig(configPath, &cfg)
 	if err != nil {
+		fmt.Println("config error: ", err)
 		return nil, fmt.Errorf("config error: %w", err)
 	}
 
-	err = cleanenv.ReadEnv(cfg)
+	err = cleanenv.ReadEnv(&cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	return cfg, nil
+	fmt.Println("Config loaded successfully")
+
+	return &cfg, nil
 }

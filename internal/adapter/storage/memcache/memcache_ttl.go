@@ -8,8 +8,7 @@ import (
 )
 
 var (
-	_              cache.MemcacheTTL = (*memcacheTTL)(nil)
-	MemcacheTTLSet                   = wire.NewSet(NewMemcacheTTL)
+	_ cache.MemcacheTTL = (*memcacheTTL)(nil)
 )
 
 type memcacheTTL struct {

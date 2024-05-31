@@ -25,12 +25,10 @@ var (
 
 type (
 	server struct {
-		ctx              context.Context
-		cfg              *config.Config
-		gatewayLogger    *zap.Logger
-		authLogger       *zap.Logger
-		managementLogger *zap.Logger
-		app              *fiber.App
+		ctx           context.Context
+		cfg           *config.Config
+		gatewayLogger *zap.Logger
+		app           *fiber.App
 	}
 )
 
@@ -38,15 +36,11 @@ func NewHTTPServer(
 	ctx context.Context,
 	cfg *config.Config,
 	gatewayLogger *zap.Logger,
-	authLogger *zap.Logger,
-	managementLogger *zap.Logger,
 ) http.ServerMaker {
 	return &server{
-		ctx:              ctx,
-		cfg:              cfg,
-		gatewayLogger:    gatewayLogger,
-		authLogger:       authLogger,
-		managementLogger: managementLogger,
+		ctx:           ctx,
+		cfg:           cfg,
+		gatewayLogger: gatewayLogger,
 	}
 }
 

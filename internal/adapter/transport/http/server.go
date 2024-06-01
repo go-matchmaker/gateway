@@ -3,7 +3,9 @@ package http
 import (
 	"context"
 	"errors"
+	"gateway/internal/core/port/cache"
 	"github.com/goccy/go-json"
+	"github.com/gofiber/fiber/v3/middleware/session"
 
 	"fmt"
 	"gateway/internal/adapter/config"
@@ -29,6 +31,8 @@ type (
 		cfg           *config.Config
 		gatewayLogger *zap.Logger
 		app           *fiber.App
+		session       *session.Store
+		cache         cache.MemcacheTTL
 	}
 )
 
@@ -36,11 +40,13 @@ func NewHTTPServer(
 	ctx context.Context,
 	cfg *config.Config,
 	gatewayLogger *zap.Logger,
+	memCache cache.MemcacheTTL,
 ) http.ServerMaker {
 	return &server{
 		ctx:           ctx,
 		cfg:           cfg,
 		gatewayLogger: gatewayLogger,
+		cache:         memCache,
 	}
 }
 
@@ -57,6 +63,7 @@ func (s *server) Start(ctx context.Context) error {
 	})
 
 	s.app = app
+	s.session = session.New()
 	fiberConnURL := fmt.Sprintf("%s:%d", s.cfg.HTTP.Host, s.cfg.HTTP.Port)
 
 	go func() {

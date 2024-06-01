@@ -1,8 +1,22 @@
 package dto
 
+// Requests
+type UserLoginRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,password"`
+}
+
+type CreateUserRequest struct {
+	User         User                  `json:"user"`
+	Permissions  map[string]Permission `json:"permissions"`
+	DepartmentID string                `json:"department_id"`
+}
+
+// Responses
 type UserLoginResponse struct {
 	Token     string `json:"token"`
 	PublicKey string `json:"public_key"`
+	User      User   `json:"user"`
 }
 
 type AuthMiddlewareResponse struct {
@@ -13,16 +27,4 @@ type AuthMiddlewareResponse struct {
 	PhoneNumber  string                `json:"phone_number"`
 	DepartmentID int                   `json:"department_id"`
 	Attributes   map[string]Permission `json:"attributes"`
-}
-
-type Permission struct {
-	View        bool `json:"view"`
-	Search      bool `json:"search"`
-	Detail      bool `json:"detail"`
-	Add         bool `json:"add"`
-	Update      bool `json:"update"`
-	Delete      bool `json:"delete"`
-	Export      bool `json:"export"`
-	Import      bool `json:"import"`
-	CanSeePrice bool `json:"can_see_price"`
 }

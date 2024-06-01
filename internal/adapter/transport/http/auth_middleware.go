@@ -1,14 +1,11 @@
 package http
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
+	"gateway/internal/core/util"
 	"gateway/internal/dto"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
-	"net/http"
-	"strings"
 )
 
 const (
@@ -19,66 +16,40 @@ const (
 )
 
 func (s *server) GetUserDetail(c fiber.Ctx) error {
-	token := c.Get(AuthHeader)
-	if token == "" {
-		return s.errorResponse(c, "authorization header is not provided", errors.New("authorization header is not provided"), nil, fiber.StatusUnauthorized)
-	}
-
-	fields := strings.Fields(token)
-	if len(fields) != 2 {
-		return s.errorResponse(c, "invalid authorization header format", errors.New("invalid authorization header format"), nil, fiber.StatusUnauthorized)
-	}
-
-	authorizationType := strings.ToLower(fields[0])
-	if authorizationType != AuthType {
-		return s.errorResponse(c, fmt.Sprintf("unsupported authorization type %s", authorizationType), errors.New(fmt.Sprintf("unsupported authorization type %s", authorizationType)), nil, fiber.StatusUnauthorized)
-	}
-
-	accessToken := fields[1]
-	accessPublic := c.Get(AuthPublic)
-	if accessPublic == "" {
-		return s.errorResponse(c, "public key is not provided", errors.New("public key is not provided"), nil, fiber.StatusUnauthorized)
-	}
-
-	loginBody := dto.UserAuthRequest{
-		Token:     accessToken,
-		PublicKey: accessPublic,
-	}
-
-	jsonData, err := json.Marshal(loginBody)
+	sess, err := s.session.Get(c)
 	if err != nil {
-		return s.errorResponse(c, "error marshalling loginBody", err, nil, fiber.StatusInternalServerError)
+		return s.errorResponse(c, "error getting session", err, nil, fiber.StatusInternalServerError)
 	}
 
-	req, err := http.NewRequest("POST", "http://localhost:8001/auth/get-detail", bytes.NewBuffer(jsonData))
+	userDetail := sess.Get("userDetail")
+	if userDetail == nil {
+		return s.errorResponse(c, "user not authenticated", errors.New("user not authenticated"), nil, fiber.StatusUnauthorized)
+	}
+
+	var user dto.UserLoginResponse
+	err = json.Unmarshal([]byte(userDetail.(string)), &user)
 	if err != nil {
-		return s.errorResponse(c, "error creating new request", err, nil, fiber.StatusInternalServerError)
+		return s.errorResponse(c, "error unmarshalling user detail", err, nil, fiber.StatusInternalServerError)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
+	cacheKey := util.GenerateCacheKey("permission", user.User.ID)
+	cachedPermissions, err := s.cache.Get(c.Context(), cacheKey)
 	if err != nil {
-		return s.errorResponse(c, "error sending request", err, nil, fiber.StatusInternalServerError)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return s.errorResponse(c, "received non-OK status code", errors.New("received non-OK status code"), nil, fiber.StatusUnauthorized)
+		return s.errorResponse(c, "error getting cache", err, nil, fiber.StatusInternalServerError)
 	}
 
-	var authResponse dto.AuthMiddlewareResponse
-	err = json.NewDecoder(resp.Body).Decode(&authResponse)
+	var permissions map[string]dto.Permission
+	err = json.Unmarshal(cachedPermissions, &permissions)
 	if err != nil {
-		return s.errorResponse(c, "error decoding response", err, nil, fiber.StatusInternalServerError)
+		return s.errorResponse(c, "error unmarshalling permissions", err, nil, fiber.StatusInternalServerError)
 	}
 
-	c.Locals(UserDetail, authResponse)
-
+	user.User.UserPermissions = permissions
+	c.Locals(UserDetail, user)
 	return c.Next()
 }
 
-func (s *server) HRPermission(c fiber.Ctx) error {
+func (s *server) HRAddPermission(c fiber.Ctx) error {
 	userDetail, ok := c.Locals(UserDetail).(dto.AuthMiddlewareResponse)
 	if !ok {
 		return s.errorResponse(c, "user detail not found in context", errors.New("user detail not found in context"), nil, fiber.StatusUnauthorized)

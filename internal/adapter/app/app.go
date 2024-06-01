@@ -42,8 +42,9 @@ func httpServerFunc(
 	ctx context.Context,
 	Cfg *config.Config,
 	gatewayLogger *zap.Logger,
+	ttl cache.MemcacheTTL,
 ) (http.ServerMaker, func(), error) {
-	httpServer := adapter_http.NewHTTPServer(ctx, Cfg, gatewayLogger)
+	httpServer := adapter_http.NewHTTPServer(ctx, Cfg, gatewayLogger, ttl)
 	err := httpServer.Start(ctx)
 	if err != nil {
 		return nil, nil, err

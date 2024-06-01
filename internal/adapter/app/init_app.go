@@ -12,7 +12,7 @@ func InitApp(ctx context.Context, wg *sync.WaitGroup, rw *sync.RWMutex, Cfg *con
 	gatewayLogger *zap.Logger) (*App, func(), error) {
 	cacheMemcache := memcache.NewMemcache()
 	memcacheTTL := memcache.NewMemcacheTTL()
-	serverMaker, cleanup, err := httpServerFunc(ctx, Cfg, gatewayLogger)
+	serverMaker, cleanup, err := httpServerFunc(ctx, Cfg, gatewayLogger, memcacheTTL)
 	if err != nil {
 		cleanup()
 		return nil, nil, err

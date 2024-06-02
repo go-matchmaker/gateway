@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gateway/internal/core/util"
 	"gateway/internal/dto"
+	"reflect"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
@@ -66,4 +67,31 @@ func (s *server) HRAddPermission(c fiber.Ctx) error {
 	}
 
 	return c.Next()
+}
+
+func (s *server) CheckPermission(requiredModule string, requiredAction string) fiber.Handler {
+	return func(c fiber.Ctx) error {
+		user, ok := c.Locals(UserDetail).(dto.UserLoginResponse)
+		if !ok {
+			return s.errorResponse(c, "user detail not found in context", errors.New("user detail not found"), nil, fiber.StatusForbidden)
+		}
+
+		permissions, ok := user.Data.User.UserPermissions[requiredModule]
+		if !ok {
+			return s.errorResponse(c, "module permission not found", errors.New("module permission not found"), nil, fiber.StatusForbidden)
+		}
+
+		// Use reflection to check the specific action permission
+		val := reflect.ValueOf(permissions)
+		field := val.FieldByName(requiredAction)
+		if !field.IsValid() {
+			return s.errorResponse(c, "invalid action", errors.New("invalid action"), nil, fiber.StatusBadRequest)
+		}
+
+		if !field.Bool() {
+			return s.errorResponse(c, "action not allowed", errors.New("action not allowed"), nil, fiber.StatusForbidden)
+		}
+
+		return c.Next()
+	}
 }

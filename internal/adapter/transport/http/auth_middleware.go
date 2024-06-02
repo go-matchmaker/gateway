@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gateway/internal/core/util"
 	"gateway/internal/dto"
+
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
 )
@@ -32,7 +33,7 @@ func (s *server) GetUserDetail(c fiber.Ctx) error {
 		return s.errorResponse(c, "error unmarshalling user detail", err, nil, fiber.StatusInternalServerError)
 	}
 
-	cacheKey := util.GenerateCacheKey("permission", user.User.ID)
+	cacheKey := util.GenerateCacheKey("permission", user.Data.User.ID)
 	cachedPermissions, err := s.cache.Get(c.Context(), cacheKey)
 	if err != nil {
 		return s.errorResponse(c, "error getting cache", err, nil, fiber.StatusInternalServerError)
@@ -44,7 +45,7 @@ func (s *server) GetUserDetail(c fiber.Ctx) error {
 		return s.errorResponse(c, "error unmarshalling permissions", err, nil, fiber.StatusInternalServerError)
 	}
 
-	user.User.UserPermissions = permissions
+	user.Data.User.UserPermissions = permissions
 	c.Locals(UserDetail, user)
 	return c.Next()
 }

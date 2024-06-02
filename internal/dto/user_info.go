@@ -9,11 +9,9 @@ type User struct {
 	Surname         string                `json:"surname"`
 	Email           string                `json:"email"`
 	PhoneNumber     string                `json:"phone_number"`
-	Password        string                `json:"password"`
 	Department      string                `json:"department"`
-	UserPermissions map[string]Permission `json:"user_permissions"`
+	UserPermissions map[string]Permission `json:"attributes"`
 	CreatedAt       time.Time             `json:"created_at"`
-	UpdatedAt       time.Time             `json:"updated_at"`
 }
 
 type Permission struct {

@@ -3,12 +3,14 @@ package http
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"gateway/internal/core/util"
 	"gateway/internal/dto"
-	"github.com/goccy/go-json"
-	"github.com/gofiber/fiber/v3"
 	"net/http"
 	"time"
+
+	"github.com/goccy/go-json"
+	"github.com/gofiber/fiber/v3"
 )
 
 func (s *server) Login(c fiber.Ctx) error {
@@ -33,6 +35,7 @@ func (s *server) Login(c fiber.Ctx) error {
 	if resp.StatusCode != http.StatusOK {
 		return s.errorResponse(c, "received non-OK status code", errors.New("received non-OK status code"), nil, fiber.StatusUnauthorized)
 	}
+	fmt.Println("login success", resp.Body)
 	var loginResponse dto.UserLoginResponse
 	err = json.NewDecoder(resp.Body).Decode(&loginResponse)
 	if err != nil {
@@ -47,8 +50,8 @@ func (s *server) Login(c fiber.Ctx) error {
 
 	sess.Set("userDetail", loginResponse)
 
-	cacheKey := util.GenerateCacheKey("permission", loginResponse.User.ID)
-	cacheData, _ := json.Marshal(loginResponse.User.UserPermissions)
+	cacheKey := util.GenerateCacheKey("permission", loginResponse.Data.User.ID)
+	cacheData, _ := json.Marshal(loginResponse.Data.User.UserPermissions)
 	err = s.cache.Set(c.Context(), cacheKey, cacheData, time.Minute*10)
 	if err != nil {
 		return s.errorResponse(c, "error setting cache", err, nil, fiber.StatusInternalServerError)

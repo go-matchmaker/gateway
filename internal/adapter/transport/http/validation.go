@@ -1,9 +1,10 @@
 package http
 
 import (
-	"github.com/go-playground/validator/v10"
 	"regexp"
 	"sync"
+
+	"github.com/go-playground/validator/v10"
 )
 
 var customValidators = map[string]func(s validator.FieldLevel) bool{
@@ -79,12 +80,23 @@ func ValidateRequestByStruct[T any](s T) []*ValidationMessage {
 	var errors []*ValidationMessage
 	err := validate.Struct(s)
 	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			var element ValidationMessage
-			element.FailedField = err.Field()
-			element.Tag = err.Tag()
-			element.Message = err.Error()
-			errors = append(errors, &element)
+		// Check for InvalidValidationError type
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			errors = append(errors, &ValidationMessage{
+				FailedField: "N/A",
+				Tag:         "invalid",
+				Message:     err.Error(),
+			})
+			return errors
+		}
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			for _, err := range validationErrors {
+				var element ValidationMessage
+				element.FailedField = err.Field()
+				element.Tag = err.Tag()
+				element.Message = err.Error()
+				errors = append(errors, &element)
+			}
 		}
 	}
 	return errors

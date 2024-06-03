@@ -32,3 +32,7 @@ func (s *server) CreateUser(c fiber.Ctx) error {
 
 	return s.successResponse(c, nil, "User created successfully", fiber.StatusOK)
 }
+
+func (s *server) CreateDepartment(c fiber.Ctx) error {
+	return nil
+}

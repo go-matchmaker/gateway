@@ -18,11 +18,13 @@ type UserLoginResponse struct {
 	Message string        `json:"message"`
 	Status  int           `json:"status"`
 }
+
 type UserLoginData struct {
 	Token     string `json:"token"`
 	PublicKey string `json:"public_key"`
 	User      User   `json:"user"`
 }
+
 type AuthMiddlewareResponse struct {
 	Email        string                `json:"email"`
 	Password     string                `json:"password"`

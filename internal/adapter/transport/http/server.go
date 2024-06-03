@@ -3,22 +3,15 @@ package http
 import (
 	"context"
 	"errors"
-	"gateway/internal/core/port/cache"
-	"github.com/goccy/go-json"
-	"github.com/gofiber/fiber/v3/middleware/session"
-
 	"fmt"
 	"gateway/internal/adapter/config"
+	"gateway/internal/core/port/cache"
 	"gateway/internal/core/port/http"
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
 	"go.uber.org/zap"
 	std_http "net/http"
 	"time"
-)
-
-const (
-	viewPath   = "../../internal/adapter/transport/http/web/views"
-	renderType = ".html"
 )
 
 var (
@@ -31,7 +24,6 @@ type (
 		cfg           *config.Config
 		gatewayLogger *zap.Logger
 		app           *fiber.App
-		session       *session.Store
 		cache         cache.MemcacheTTL
 	}
 )
@@ -63,7 +55,6 @@ func (s *server) Start(ctx context.Context) error {
 	})
 
 	s.app = app
-	s.session = session.New()
 	fiberConnURL := fmt.Sprintf("%s:%d", s.cfg.HTTP.Host, s.cfg.HTTP.Port)
 
 	go func() {

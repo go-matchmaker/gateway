@@ -1,19 +1,5 @@
 package dto
 
-import "time"
-
-type User struct {
-	ID              string                `json:"id"`
-	Role            string                `json:"role"`
-	Name            string                `json:"name"`
-	Surname         string                `json:"surname"`
-	Email           string                `json:"email"`
-	PhoneNumber     string                `json:"phone_number"`
-	Department      string                `json:"department"`
-	UserPermissions map[string]Permission `json:"attributes"`
-	CreatedAt       time.Time             `json:"created_at"`
-}
-
 type Permission struct {
 	View        bool `json:"view"`
 	Search      bool `json:"search"`

@@ -4,13 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"gateway/internal/core/util"
 	"gateway/internal/dto"
-	"net/http"
-	"time"
-
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
+	"net/http"
 )
 
 func (s *server) Login(c fiber.Ctx) error {
@@ -40,21 +37,6 @@ func (s *server) Login(c fiber.Ctx) error {
 	err = json.NewDecoder(resp.Body).Decode(&loginResponse)
 	if err != nil {
 		return s.errorResponse(c, "error decoding response", err, nil, fiber.StatusInternalServerError)
-	}
-
-	sess, err := s.session.Get(c)
-	if err != nil {
-		return s.errorResponse(c, "error getting session", err, nil, fiber.StatusInternalServerError)
-	}
-	defer sess.Save()
-
-	sess.Set("userDetail", loginResponse)
-
-	cacheKey := util.GenerateCacheKey("permission", loginResponse.Data.User.ID)
-	cacheData, _ := json.Marshal(loginResponse.Data.User.UserPermissions)
-	err = s.cache.Set(c.Context(), cacheKey, cacheData, time.Minute*10)
-	if err != nil {
-		return s.errorResponse(c, "error setting cache", err, nil, fiber.StatusInternalServerError)
 	}
 
 	return s.successResponse(c, loginResponse, "login success", fiber.StatusOK)

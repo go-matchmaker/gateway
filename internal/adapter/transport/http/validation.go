@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"regexp"
 	"sync"
 
@@ -77,27 +78,29 @@ func CreateNewValidator() *validator.Validate {
 
 func ValidateRequestByStruct[T any](s T) []*ValidationMessage {
 	validate := CreateNewValidator()
-	var errors []*ValidationMessage
+	var allErrors []*ValidationMessage
 	err := validate.Struct(s)
 	if err != nil {
-		// Check for InvalidValidationError type
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			errors = append(errors, &ValidationMessage{
+		var invalidValidationError *validator.InvalidValidationError
+		if errors.As(err, &invalidValidationError) {
+			allErrors = append(allErrors, &ValidationMessage{
 				FailedField: "N/A",
 				Tag:         "invalid",
 				Message:     err.Error(),
 			})
-			return errors
+			return allErrors
 		}
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+
+		var validationErrors validator.ValidationErrors
+		if errors.As(err, &validationErrors) {
 			for _, err := range validationErrors {
 				var element ValidationMessage
 				element.FailedField = err.Field()
 				element.Tag = err.Tag()
 				element.Message = err.Error()
-				errors = append(errors, &element)
+				allErrors = append(allErrors, &element)
 			}
 		}
 	}
-	return errors
+	return allErrors
 }

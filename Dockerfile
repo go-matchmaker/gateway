@@ -6,7 +6,7 @@ RUN go mod download
 
 # Step 2: Builder
 FROM golang:1.22.2-alpine3.18 as builder
-LABEL maintainer="otovinn"
+LABEL maintainer="easybilet"
 COPY --from=modules /go/pkg /go/pkg
 COPY . /app
 WORKDIR /app

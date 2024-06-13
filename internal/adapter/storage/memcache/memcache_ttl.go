@@ -3,12 +3,14 @@ package memcache
 import (
 	"context"
 	"gateway/internal/core/port/cache"
+	"github.com/google/wire"
 	"github.com/maypok86/otter"
 	"time"
 )
 
 var (
-	_ cache.MemcacheTTL = (*memcacheTTL)(nil)
+	_              cache.MemcacheTTL = (*memcacheTTL)(nil)
+	MemCacheTTLSet                   = wire.NewSet(NewMemcacheTTL)
 )
 
 type memcacheTTL struct {

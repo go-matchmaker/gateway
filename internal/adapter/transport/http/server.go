@@ -21,7 +21,7 @@ var (
 type (
 	server struct {
 		ctx           context.Context
-		cfg           *config.Config
+		cfg           *config.Container
 		gatewayLogger *zap.Logger
 		app           *fiber.App
 		cache         cache.MemcacheTTL
@@ -30,7 +30,7 @@ type (
 
 func NewHTTPServer(
 	ctx context.Context,
-	cfg *config.Config,
+	cfg *config.Container,
 	gatewayLogger *zap.Logger,
 	memCache cache.MemcacheTTL,
 ) http.ServerMaker {

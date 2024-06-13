@@ -39,9 +39,9 @@ func main() {
 	zap.S().Info("Shutting down successfully")
 }
 
-func prepareApp(ctx context.Context, wg *sync.WaitGroup, rw *sync.RWMutex, cfg *config.Config, gatewayLogger *zap.Logger) func() {
+func prepareApp(ctx context.Context, wg *sync.WaitGroup, rw *sync.RWMutex, cfg *config.Container, gatewayLogger *zap.Logger) func() {
 	var errMsg error
-	a, cleanUp, errMsg := app.InitApp(ctx, wg, rw, cfg, gatewayLogger)
+	a, cleanUp, errMsg := app.InitApp(ctx, rw, cfg, gatewayLogger)
 	if errMsg != nil {
 		zap.S().Error("failed init app", errMsg)
 		<-ctx.Done()

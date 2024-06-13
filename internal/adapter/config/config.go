@@ -28,15 +28,15 @@ type SettingsConfig struct {
 	ServerReadTimeout int           `yaml:"server_read_timeout"`
 }
 
-type Config struct {
+type Container struct {
 	App      AppConfig      `yaml:"app"`
 	Log      LogConfig      `yaml:"log"`
 	HTTP     HTTPConfig     `yaml:"http"`
 	Settings SettingsConfig `yaml:"settings"`
 }
 
-func LoadConfig() (*Config, error) {
-	var cfg Config
+func LoadConfig() (*Container, error) {
+	var cfg Container
 
 	err := cleanenv.ReadConfig(configPath, &cfg)
 	if err != nil {

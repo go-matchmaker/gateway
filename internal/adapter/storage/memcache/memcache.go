@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"gateway/internal/core/port/cache"
+	"github.com/google/wire"
 	"github.com/maypok86/otter"
 )
 
@@ -11,6 +12,7 @@ var (
 	ErrCacheSet                = errors.New("error while trying to set cache")
 	ErrCacheGet                = errors.New("error while trying to get cache")
 	_           cache.Memcache = (*memcache)(nil)
+	MemCacheSet                = wire.NewSet(NewMemcache)
 )
 
 type memcache struct {

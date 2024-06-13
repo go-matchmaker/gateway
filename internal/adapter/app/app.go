@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"gateway/internal/adapter/config"
-	adapter_http "gateway/internal/adapter/transport/http"
 	"gateway/internal/core/port/cache"
 	"gateway/internal/core/port/http"
 	"sync"
@@ -13,7 +12,7 @@ import (
 
 type App struct {
 	rw            *sync.RWMutex
-	Cfg           *config.Config
+	Cfg           *config.Container
 	GatewayLogger *zap.Logger
 	HTTP          http.ServerMaker
 	MemCache      cache.Memcache
@@ -22,7 +21,7 @@ type App struct {
 
 func New(
 	rw *sync.RWMutex,
-	cfg *config.Config,
+	cfg *config.Container,
 	gatewayLogger *zap.Logger,
 	http http.ServerMaker,
 	memCache cache.Memcache,
@@ -36,20 +35,6 @@ func New(
 		MemCache:      memCache,
 		MemCacheTTL:   memCacheTTL,
 	}
-}
-
-func httpServerFunc(
-	ctx context.Context,
-	Cfg *config.Config,
-	gatewayLogger *zap.Logger,
-	ttl cache.MemcacheTTL,
-) (http.ServerMaker, func(), error) {
-	httpServer := adapter_http.NewHTTPServer(ctx, Cfg, gatewayLogger, ttl)
-	err := httpServer.Start(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	return httpServer, func() { httpServer.Close(ctx) }, nil
 }
 
 func (a *App) Run(ctx context.Context) {

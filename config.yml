@@ -1,0 +1,16 @@
+app:
+  name: "gateway"
+
+log:
+  level: 1
+
+http:
+  host: "0.0.0.0"
+  port: 8000
+
+psql:
+  url: "postgres://postgres:pass@localhost:5432/crm?sslmode=disable&options=-c%20default_transaction_read_only=on"
+
+settings:
+  ttl: "60m" # minutes
+  server_read_timeout: 15

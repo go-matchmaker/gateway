@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: go-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - common-network
+
+networks:
+  common-network:
+    name: common-network
+    driver: bridge

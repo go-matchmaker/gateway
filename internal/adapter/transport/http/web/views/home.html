@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <style>
+        .text-center {
+            text-align: center;
+        }
+        .text-4xl {
+            font-size: 2.25rem; /* 36px */
+        }
+        .text-xl {
+            font-size: 1.25rem; /* 20px */
+        }
+        .text-indigo-700 {
+            color: #3730a3; /* Adjust the color code as needed */
+        }
+        .text-amber-700 {
+            color: #b45309; /* Adjust the color code as needed */
+        }
+        .font-extrabold {
+            font-weight: 800;
+        }
+        .font-medium {
+            font-weight: 500;
+        }
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .mt-36 {
+            margin-top: 9rem; /* 144px */
+        }
+        .mb-6 {
+            margin-bottom: 1.5rem; /* 24px */
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1 class="text-center text-4xl text-indigo-700 font-extrabold mx-auto mt-36 mb-6">
+            {{ .Title }}
+        </h1>
+        <p class="text-center text-xl text-amber-700 font-medium mb-6">
+            {{ .Subtitle }}
+        </p>
+    </main>
+</body>
+</html>
